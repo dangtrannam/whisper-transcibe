@@ -1,0 +1,43 @@
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.env/
+.venv/
+
+# IDE settings
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test coverage and reports
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+coverage.xml
+.tox/
+
+# Project-specific
+*.txt  # Transcription output files
+!requirements.txt  # But keep requirements.txt
+
+# OS-specific files
+.DS_Store  # macOS
+Thumbs.db  # Windows
+*.log
+
+# Model cache and temporary files
+*.pt  # PyTorch model files
+.cache/

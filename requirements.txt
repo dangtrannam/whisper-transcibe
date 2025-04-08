@@ -1,0 +1,7 @@
+openai-whisper
+torch
+click
+pytest
+pytest-cov
+black
+pylint>=3.0.2
