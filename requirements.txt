@@ -5,3 +5,5 @@ pytest
 pytest-cov
 black
 pylint>=3.0.2
+PySide6>=6.6.0  # For GUI components
+psutil>=5.9.0   # For system monitoring

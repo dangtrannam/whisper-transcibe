@@ -1,0 +1,3 @@
+"""
+Whisper Transcribe Application
+""" 

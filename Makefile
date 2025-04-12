@@ -1,15 +1,17 @@
 install:
 	pip install --upgrade pip && pip install -r requirements.txt
-	# Install ffmpeg based on OS
-	@if command -v apt-get > /dev/null; then \
-		echo "Installing ffmpeg using apt-get..."; \
-		sudo apt-get update && sudo apt-get install -y ffmpeg; \
-	elif command -v brew > /dev/null; then \
-		echo "Installing ffmpeg using brew..."; \
-		brew install ffmpeg; \
-	else \
-		echo "Please install ffmpeg manually: https://ffmpeg.org/download.html"; \
-	fi
+	@echo "Please install ffmpeg manually if not already installed:"
+	@echo "Windows: https://ffmpeg.org/download.html or 'choco install ffmpeg'"
+	@echo "Linux: sudo apt-get install ffmpeg"
+	@echo "macOS: brew install ffmpeg"
+
+install-linux:
+	pip install --upgrade pip && pip install -r requirements.txt
+	sudo apt-get update && sudo apt-get install -y ffmpeg
+
+install-mac:
+	pip install --upgrade pip && pip install -r requirements.txt
+	brew install ffmpeg
 
 lint:
 	python -m pylint app.py
@@ -31,4 +33,4 @@ clean:
 
 all: install format test
 
-.PHONY: install lint test format run-example clean all
+.PHONY: install install-linux install-mac lint test format run-example clean all

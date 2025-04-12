@@ -5,7 +5,7 @@ This script provides a command-line interface for transcribing audio files
 using Whisper, with options for model selection, output path and precision.
 """
 import click
-from src.transcriber import Transcriber
+from src.core import Transcriber
 
 
 @click.command()

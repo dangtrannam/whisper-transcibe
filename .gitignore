@@ -42,3 +42,4 @@ Thumbs.db  # Windows
 *.pt  # PyTorch model files
 .cache/
 audio/
+/.cursor
