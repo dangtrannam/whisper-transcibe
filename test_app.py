@@ -3,7 +3,7 @@ import tempfile
 from unittest.mock import patch, MagicMock
 import pytest
 from click.testing import CliRunner
-import app
+import app as app
 
 
 @pytest.fixture
@@ -66,54 +66,111 @@ def test_transcribe_basic_functionality(mock_load_model, mock_whisper_model, run
             assert "This is a test transcription." in result.output
 
 
-@patch("whisper.load_model")
-def test_default_output_filename(mock_load_model, mock_whisper_model, runner):
+@patch("app.Transcriber")
+def test_default_output_filename(MockTranscriber, runner):
     """Test that default output filename is created correctly when not specified"""
-    mock_load_model.return_value = mock_whisper_model
+    # Configure the mock Transcriber instance and its methods
+    mock_instance = MockTranscriber.return_value
+    mock_instance.transcribe.return_value = {"text": "This is a test transcription."}
+    # Mock save_transcription to return the generated path for verification
+    def mock_save(text, output_path=None):
+        # In the default case (output_path is None), the app calculates it
+        if output_path is None:
+            output_path = os.path.splitext(audio_file_path)[0] + ".txt"
+        
+        # Actually write the file to disk
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write(text)
+        
+        return output_path
 
-    with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as audio_file:
-        try:
-            expected_output = os.path.splitext(audio_file.name)[0] + ".txt"
+    mock_instance.save_transcription.side_effect = mock_save # Use side effect if complex logic needed
 
-            # Make sure test file doesn't exist before the test
-            if os.path.exists(expected_output):
-                os.unlink(expected_output)
+    # Create, close, and get path of the temporary file
+    audio_file = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False)
+    audio_file_path = audio_file.name
+    audio_file.close() # Close the handle before invoking the app
 
-            result = runner.invoke(app.transcribe, ["--model", "base", audio_file.name])
+    expected_output = None # Define outside try for finally block
+    try:
+        expected_output = os.path.splitext(audio_file_path)[0] + ".txt"
 
-            # Check command ran successfully
-            assert result.exit_code == 0
-
-            # Check the output file was created with the right name
-            assert os.path.exists(expected_output)
-
-            # Check file content
-            with open(expected_output, "r", encoding="utf-8") as f:
-                content = f.read()
-                assert content == "This is a test transcription."
-
-            # Clean up
+        # Make sure expected output file doesn't exist before the test
+        if os.path.exists(expected_output):
             os.unlink(expected_output)
-        finally:
-            # Clean up temporary audio file
-            if os.path.exists(audio_file.name):
-                os.unlink(audio_file.name)
+
+        # Run the command using the file path
+        result = runner.invoke(app.transcribe, ["--model", "base", audio_file_path])
+
+        # Check command ran successfully
+        assert result.exit_code == 0, f"CLI command failed: {result.output}"
+
+        # Verify Transcriber instantiation and methods were called
+        MockTranscriber.assert_called_once_with(model_name="base")
+        mock_instance.load_model.assert_called_once()
+        mock_instance.transcribe.assert_called_once_with(audio_file_path, fp16=True)
+        # Check save_transcription call - it receives the result text and potentially None for output path
+        mock_instance.save_transcription.assert_called_once_with("This is a test transcription.", None)
 
 
-@patch("whisper.load_model")
-def test_fp16_parameter(mock_load_model, mock_whisper_model, runner):
+        # Check the output file was created with the right name
+        assert os.path.exists(expected_output), f"Expected output file '{expected_output}' was not created."
+
+        # Check file content (app.py should write this based on mocked transcribe result)
+        with open(expected_output, "r", encoding="utf-8") as f:
+            content = f.read()
+            assert content == "This is a test transcription."
+
+        # Check CLI output message mentions the correct path
+        assert f"Transcription saved to: {expected_output}" in result.output
+
+    finally:
+        # Clean up temporary audio file
+        if os.path.exists(audio_file_path):
+            os.unlink(audio_file_path)
+        # Clean up output file
+        if expected_output and os.path.exists(expected_output):
+            os.unlink(expected_output)
+
+
+@patch("app.Transcriber")
+def test_fp16_parameter(MockTranscriber, runner):
     """Test that fp16 parameter is correctly passed to the model"""
-    mock_load_model.return_value = mock_whisper_model
+    mock_instance = MockTranscriber.return_value
+    mock_instance.transcribe.return_value = {"text": "Test"}
+    def mock_save(text, output_path=None):
+        if output_path is None:
+            output_path = os.path.splitext(audio_file_path)[0] + ".txt"
+        # Actually write to the file
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write(text)
+        return output_path
+    mock_instance.save_transcription.side_effect = mock_save
 
-    with tempfile.NamedTemporaryFile(suffix=".mp3") as audio_file:
+    # Create, close, get path
+    audio_file = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False)
+    audio_file_path = audio_file.name
+    audio_file.close()
+
+    output_path = None
+    try:
         # Test with fp16=False
-        result = runner.invoke(app.transcribe, ["--no-fp16", audio_file.name])
+        result = runner.invoke(app.transcribe, ["--no-fp16", audio_file_path])
 
         # Check command ran successfully
         assert result.exit_code == 0
 
         # Check the transcribe method was called with fp16=False
-        mock_whisper_model.transcribe.assert_called_with(audio_file.name, fp16=False)
+        mock_instance.transcribe.assert_called_with(audio_file_path, fp16=False)
+        
+        # Get the expected output path for cleanup
+        output_path = os.path.splitext(audio_file_path)[0] + ".txt"
+    finally:
+        if os.path.exists(audio_file_path):
+            os.unlink(audio_file_path)
+        # Clean up output file
+        if output_path and os.path.exists(output_path):
+            os.unlink(output_path)
 
 
 def test_missing_audio_file(runner):

@@ -41,3 +41,4 @@ Thumbs.db  # Windows
 # Model cache and temporary files
 *.pt  # PyTorch model files
 .cache/
+audio/

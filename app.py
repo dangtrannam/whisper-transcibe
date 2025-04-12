@@ -4,9 +4,8 @@ Whisper Transcription Tool - Transcribe audio files using OpenAI's Whisper model
 This script provides a command-line interface for transcribing audio files
 using Whisper, with options for model selection, output path and precision.
 """
-import os
 import click
-import whisper
+from src.transcriber import Transcriber
 
 
 @click.command()
@@ -32,20 +31,16 @@ import whisper
 def transcribe(audio_file, model, output, fp16):
     """Transcribe audio file using OpenAI's Whisper model."""
     click.echo(f"Loading {model} model...")
-    model = whisper.load_model(model)
+    transcriber = Transcriber(model_name=model)
+    transcriber.load_model()
 
     click.echo("Transcribing audio...")
-    result = model.transcribe(audio_file, fp16=fp16)
-
-    # If no output path specified, use input filename with .txt extension
-    if not output:
-        output = os.path.splitext(audio_file)[0] + ".txt"
+    result = transcriber.transcribe(audio_file, fp16=fp16)
 
     # Save transcription
-    with open(output, "w", encoding="utf-8") as f:
-        f.write(result["text"])
+    output_path = transcriber.save_transcription(result["text"], output)
 
-    click.echo(f"\nTranscription saved to: {output}")
+    click.echo(f"\nTranscription saved to: {output_path}")
     click.echo("\nTranscription text:")
     click.echo(result["text"])
 
