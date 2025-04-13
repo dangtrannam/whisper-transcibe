@@ -7,3 +7,5 @@ black
 pylint>=3.0.2
 PySide6>=6.6.0  # For GUI components
 psutil>=5.9.0   # For system monitoring
+pyinstaller>=6.0.0  # For packaging the application
+pillow>=10.0.0  # For icon creation

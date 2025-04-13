@@ -84,6 +84,11 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Whisper Transcribe")
         self.setMinimumSize(900, 700)
         
+        # Set application icon if available
+        icon_path = "resources/icons/app_icon.ico"
+        if os.path.exists(icon_path):
+            self.setWindowIcon(QIcon(icon_path))
+        
         # Create the central widget and layout
         central_widget = QWidget()
         self.setCentralWidget(central_widget)

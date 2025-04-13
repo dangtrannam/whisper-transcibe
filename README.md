@@ -4,7 +4,7 @@
 ![OpenAI](https://img.shields.io/badge/OpenAI-Whisper-brightgreen.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-A command-line tool to transcribe audio files using OpenAI's Whisper speech recognition model.
+A tool to transcribe audio files using OpenAI's Whisper speech recognition model. Available as both a command-line tool and a desktop application.
 
 ## Features
 
@@ -13,6 +13,77 @@ A command-line tool to transcribe audio files using OpenAI's Whisper speech reco
 - Option to use FP16 for faster inference on GPU
 - Custom output file path option
 - Cross-platform compatibility (Windows, macOS, Linux)
+- **NEW:** Desktop application with a modern, user-friendly interface
+- **NEW:** Real-time system resource monitoring (CPU, Memory, GPU usage)
+- **NEW:** Cancel transcription feature
+
+## Desktop Application
+
+The new desktop application provides an intuitive graphical interface for transcribing audio files without using the command line.
+
+### Running the Desktop App
+
+To run the desktop application:
+
+```bash
+# First, make sure you have installed the requirements
+pip install -r requirements.txt
+
+# Then run the desktop app
+python gui_app.py
+```
+
+### Desktop App Features
+
+- Simple, modern user interface with easy-to-use controls
+- Model selection dropdown to choose between different Whisper models
+- File selector to choose audio files for transcription
+- Progress bar showing transcription status
+- One-click saving of transcription results
+- Cancel button to stop long-running transcriptions
+- Real-time system resource monitoring (CPU, Memory, GPU usage)
+
+### Building the Desktop App
+
+To build a standalone desktop application:
+
+1. Ensure you have installed all requirements:
+```bash
+pip install -r requirements.txt
+```
+
+2. Run the build script:
+```bash
+# On Windows
+build_app.bat
+
+# On macOS/Linux
+./build_app.sh
+```
+
+3. The compiled application will be available in the `dist/Whisper Transcribe` directory.
+
+#### Troubleshooting Build Issues
+
+If you encounter PyQt5 conflicts during the build process, you can use one of the alternative build scripts that create a clean virtual environment:
+
+```bash
+# On Windows
+build_app_venv.bat
+
+# On macOS/Linux
+./build_app_venv.sh
+```
+
+These scripts create a temporary virtual environment with only the required dependencies, avoiding conflicts with existing packages.
+
+## Command-Line Usage
+
+If you prefer using the command line:
+
+```bash
+python cli_app.py your_audio_file.mp3
+```
 
 ## Requirements
 

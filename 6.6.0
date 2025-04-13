@@ -1,0 +1,4 @@
+Requirement already satisfied: PySide6 in c:\users\dangt\anaconda3\lib\site-packages (6.9.0)
+Requirement already satisfied: shiboken6==6.9.0 in c:\users\dangt\anaconda3\lib\site-packages (from PySide6) (6.9.0)
+Requirement already satisfied: PySide6-Essentials==6.9.0 in c:\users\dangt\anaconda3\lib\site-packages (from PySide6) (6.9.0)
+Requirement already satisfied: PySide6-Addons==6.9.0 in c:\users\dangt\anaconda3\lib\site-packages (from PySide6) (6.9.0)
